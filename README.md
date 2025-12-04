@@ -18,14 +18,14 @@
 此遊戲商城系統主要可以分成三大部分，包含server端、client端和遊戲:
 
 ### **Server端** 
-- **Database Server** 
-   Database server 會跑在server 140.113.17.11，而port是設定為17047
+- **Database Server**: 
+  - Database server 會跑在server 140.113.17.11，而port是設定為17047
    Database server主要負責所有關於資料庫的create, read, update, delete和query的處理，當database server收到來自lobby server或developer server對於資料庫的操作請求時，database server會檢查request的內容來判斷各個request是要對哪個欄位進行什麼操作，再根據request進行資料庫操作並回傳結果。database 會以.json的形式儲存，其中包含User、Gamelog、developer、game欄位，分別儲存玩家資訊、遊戲紀錄、開發者資訊和遊戲詳情。
-- **Lobby Server** 
-   Lobby server 會跑在server 140.113.17.11上，而port是設定成17048
+- **Lobby Server**:
+  - Lobby server 會跑在server 140.113.17.11上，而port是設定成17048
    Lobby server主要負責處理玩家的所有操作與需求，會接收來自lobby_client的request判斷需要針對database做什麼操作或是是否要啟動遊戲，再根據玩家的request傳送相對應的database request到database server，當玩家的每個request被lobby server處理完後，lobby server會回傳成功或是錯誤訊息給送出request的玩家。
-- **Developer Server** 
-   Developer server 會跑在server 140.113.17.11上，而port是設定成17049
+- **Developer Server**:
+  - Developer server 會跑在server 140.113.17.11上，而port是設定成17049
    Developer server主要負責處理開發者的所有操作，包含創建遊戲、修改或上架遊戲、瀏覽詳細的遊戲資訊。Developer server匯處理developer相關的所有操作，並接收來自於developer發出的request，當developer server接收到來自developer發出的request時，會判斷每個request是關於什麼操作，如果request牽涉到database的create, read, update, delete, query，則developer會發送相對應的database request到database server進行資料庫操作。當developer server處理完每個request後，會根據職結果回傳相對應的訊息給發出request的developer。
 ### **Client端**
 - **Player Client**: Browse games, create/join rooms, play games, rate & review
@@ -422,21 +422,10 @@ All client-server communication uses LPFP:
 
 ## Demo Instructions
 
-### Pre-Demo Checklist
-
-#### For Developer (You)
-1. ✅ **Deploy servers** on 140.113.203.91
-2. ✅ **Clear database**: `./clear_database.py`
-3. ✅ **Verify servers running**: Check ports 17047, 17048, 17049
-4. ✅ **Test connectivity**: From local machine to server
-5. ✅ **Push to GitHub**: All code with clear README
-6. ✅ **Submit GitHub link** to E3 before demo
-
-#### For TAs
-1. **Clone repository** from GitHub
-2. **Update connection settings** (if needed)
-   - Edit `player/lobby_client.py`: `LOBBYSERVER_HOST = '140.113.203.91'`
-   - Edit `developer/developer_client.py`: `DEVELOPER_SERVER_HOST = '140.113.203.91'`
+#### setup
+1. **Clone repository** from GitHub https://github.com/jimmy94828/NP-Game-store-system
+2. **install python3 and pygame**
+   
 3. **Start clients**:
    ```bash
    ./start_player.py      # Player client
@@ -486,135 +475,9 @@ All client-server communication uses LPFP:
 8. First to complete line wins
 ```
 
-### Expected Questions from TAs
-
-Be prepared to explain:
-
-1. **System Architecture**
-   - Why separate Database/Lobby/Developer servers?
-   - How does dynamic game server spawning work?
-   - Port pool management strategy
-
-2. **Communication Protocol**
-   - Why LPFP instead of simple JSON?
-   - Error handling and recovery mechanisms
-   - Message format design decisions
-
-3. **Version Management**
-   - How are game versions stored?
-   - Client auto-update mechanism
-   - Backward compatibility handling
-
-4. **Concurrency**
-   - Thread safety in server components
-   - Multiple rooms running simultaneously
-   - Race condition prevention
-
-5. **Security**
-   - Password storage (currently plaintext - note limitation)
-   - File upload validation
-   - Input sanitization
-
-6. **Scalability**
-   - Port pool limits (10100-11000)
-   - Database performance considerations
-   - Future improvements
-
 ---
 
-## 🔧 Troubleshooting
-
-### Connection Issues
-
-**Problem**: "Connection refused" error
-```bash
-# Solution 1: Check server is running
-ssh user@140.113.203.91
-ps aux | grep start_server
-
-# Solution 2: Check firewall
-netstat -tuln | grep 17048
-
-# Solution 3: Verify IP in client code
-grep "LOBBYSERVER_HOST" player/lobby_client.py
-```
-
-**Problem**: "Connection timeout"
-```bash
-# Check network connectivity
-ping 140.113.203.91
-
-# Test port accessibility
-telnet 140.113.203.91 17048
-```
-
-### Server Issues
-
-**Problem**: Server crashes or stops
-```bash
-# Check logs
-tail -f server.log
-
-# Restart server
-pkill -f start_server.py
-nohup ./start_server.py > server.log 2>&1 &
-```
-
-**Problem**: Port already in use
-```bash
-# Find process using port
-lsof -i :17048
-
-# Kill process
-kill -9 <PID>
-```
-
-### Game Issues
-
-**Problem**: Game doesn't start
-- Check game files exist in `server/games/`
-- Verify config.json is valid JSON
-- Check mainFile and serverFile paths
-- **For GUI games**: Ensure pygame is installed (`pip3 install pygame`)
-
-**Problem**: "ModuleNotFoundError: No module named 'pygame'"
-```bash
-# Install pygame
-pip3 install pygame
-
-# Verify installation
-python3 -c "import pygame; print('OK')"
-```
-
-**Problem**: Game disconnects mid-match
-- Check game server logs
-- Verify network stability
-- Check for game logic errors
-
-### Database Issues
-
-**Problem**: Corrupted database.json
-```bash
-# Backup current database
-cp database.json database.json.backup
-
-# Clear and restart
-rm database.json
-./start_server.py
-```
-
-**Problem**: Data inconsistency
-```bash
-# Validate database structure
-python3 -c "import json; print(json.load(open('database.json')))"
-
-# Clear specific collections
-./clear_database.py
-```
-
----
-
-## 📁 Project Structure
+## System Structure
 
 ```
 test/
@@ -685,7 +548,7 @@ test/
 
 ---
 
-## 📝 Development Notes
+## Development Notes
 
 ### Adding New Games
 1. Create game folder: `developer/games/<dev>/<game>/`
