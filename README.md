@@ -19,22 +19,36 @@
 
 ### **Server端** 
 - **Database Server**: 
-  - Database server 會跑在server 140.113.17.11，而port是設定為17047
-   Database server主要負責所有關於資料庫的create, read, update, delete和query的處理，當database server收到來自lobby server或developer server對於資料庫的操作請求時，database server會檢查request的內容來判斷各個request是要對哪個欄位進行什麼操作，再根據request進行資料庫操作並回傳結果。database 會以.json的形式儲存，其中包含User、Gamelog、developer、game欄位，分別儲存玩家資訊、遊戲紀錄、開發者資訊和遊戲詳情。
+   - Database server主要負責所有關於資料庫的create, read, update, delete和query的處理，當database server收到來自lobby server或developer server對於資料庫的操作請求時，database server會檢查request的內容來判斷各個request是要對哪個欄位進行什麼操作，再根據request進行資料庫操作並回傳結果。database 會以.json的形式儲存，其中包含User、Gamelog、developer、game欄位，分別儲存玩家資訊、遊戲紀錄、開發者資訊和遊戲詳情。
 - **Lobby Server**:
-  - Lobby server 會跑在server 140.113.17.11上，而port是設定成17048
-   Lobby server主要負責處理玩家的所有操作與需求，會接收來自lobby_client的request判斷需要針對database做什麼操作或是是否要啟動遊戲，再根據玩家的request傳送相對應的database request到database server，當玩家的每個request被lobby server處理完後，lobby server會回傳成功或是錯誤訊息給送出request的玩家。
+   - Lobby server主要負責處理玩家的所有操作與需求，會接收來自lobby_client的request判斷需要針對database做什麼操作或是是否要啟動遊戲，再根據玩家的request傳送相對應的database request到database server，當玩家的每個request被lobby server處理完後，lobby server會回傳成功或是錯誤訊息給送出request的玩家。
 - **Developer Server**:
-  - Developer server 會跑在server 140.113.17.11上，而port是設定成17049
-   Developer server主要負責處理開發者的所有操作，包含創建遊戲、修改或上架遊戲、瀏覽詳細的遊戲資訊。Developer server匯處理developer相關的所有操作，並接收來自於developer發出的request，當developer server接收到來自developer發出的request時，會判斷每個request是關於什麼操作，如果request牽涉到database的create, read, update, delete, query，則developer會發送相對應的database request到database server進行資料庫操作。當developer server處理完每個request後，會根據職結果回傳相對應的訊息給發出request的developer。
+   - Developer server主要負責處理開發者的所有操作，包含創建遊戲、修改或上架遊戲、瀏覽詳細的遊戲資訊。Developer server匯處理developer相關的所有操作，並接收來自於developer發出的request，當developer server接收到來自developer發出的request時，會判斷每個request是關於什麼操作，如果request牽涉到database的create, read, update, delete, query，則developer會發送相對應的database request到database server進行資料庫操作。當developer server處理完每個request後，會根據職結果回傳相對應的訊息給發出request的developer。
 ### **Client端**
 - **Player Client**: Browse games, create/join rooms, play games, rate & review
 - **Developer Client**: Upload games, manage versions, create from templates
 
 ### **Supported Games**
-- **Connect Four** (2 players, CLI): Classic strategy game
-- **Multiplayer Bingo** (3-5 players, CLI): Dynamic player count Bingo game
-- **Tetris Battle** (2 players, GUI): Competitive Tetris with pygame
+#### Connect Four
+  - **Type**: CLI
+  - **Players**: 2
+  - **Dependencies**: None (standard library)
+  - **Description**: Classic Connect Four strategy game
+  - **Features**: 6x7 board, gravity-based drops, win detection
+
+#### Multiplayer Bingo
+  - **Type**: CLI
+  - **Players**: 3-5 (dynamic)
+  - **Dependencies**: None (standard library)
+  - **Description**: 5x5 Bingo with customizable player count
+  - **Features**: Random card generation, turn-based calling, multiple winning patterns
+
+#### Tetris Battle
+  - **Type**: GUI
+  - **Players**: 2
+  - **Dependencies**: `pygame` (install with `pip3 install pygame`)
+  - **Description**: Competitive Tetris with real-time gameplay
+  - **Features**: Classic Tetris mechanics, 2-player battle mode, pygame graphics
 
 **Note**: GUI games require `pygame` installation on player's machine.
 
@@ -46,20 +60,16 @@
 
 ```bash
 # 1. Clone repository
-git clone <repository-url>
+git clone [<repository-url>](https://github.com/jimmy94828/NP-Game-store-system)
 cd test
 
 # 2. Install pygame (required for GUI games like Tetris)
 pip3 install pygame
 
-# 3. Update connection settings (if needed)
-# Edit player/lobby_client.py and developer/developer_client.py
-# Change LOBBYSERVER_HOST and DEVELOPER_SERVER_HOST to server IP
-
-# 4. Start Player Client
+# 3. Start Player Client
 ./start_player.py
 
-# 5. Start Developer Client (in another terminal)
+# 4. Start Developer Client (in another terminal)
 ./start_developer.py
 ```
 
@@ -520,32 +530,6 @@ test/
                 ├── <main_file>.py
                 └── README.md
 ```
-
----
-
-## Available Games
-
-### Connect Four
-- **Type**: CLI
-- **Players**: 2
-- **Dependencies**: None (standard library)
-- **Description**: Classic Connect Four strategy game
-- **Features**: 6x7 board, gravity-based drops, win detection
-
-### Multiplayer Bingo
-- **Type**: CLI
-- **Players**: 3-5 (dynamic)
-- **Dependencies**: None (standard library)
-- **Description**: 5x5 Bingo with customizable player count
-- **Features**: Random card generation, turn-based calling, multiple winning patterns
-
-### Tetris Battle
-- **Type**: GUI
-- **Players**: 2
-- **Dependencies**: `pygame` (install with `pip3 install pygame`)
-- **Description**: Competitive Tetris with real-time gameplay
-- **Features**: Classic Tetris mechanics, 2-player battle mode, pygame graphics
-
 ---
 
 ## Development Notes
