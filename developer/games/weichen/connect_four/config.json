@@ -1,0 +1,9 @@
+{
+  "name": "Extended Connect Four",
+  "version": "1.0.0",
+  "gameType": "CLI",
+  "maxPlayers": 2,
+  "description": "Classic Connect Four with 2-player competitive mode",
+  "mainFile": "connect_four_client.py",
+  "serverFile": "connect_four_server.py"
+}

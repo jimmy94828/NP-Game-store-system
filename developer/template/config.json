@@ -1,0 +1,9 @@
+{
+  "name": "My Game",
+  "version": "1.0.0",
+  "gameType": "GUI",
+  "maxPlayers": 2,
+  "description": "A template game following platform standards",
+  "mainFile": "game_client.py",
+  "serverFile": "game_server.py"
+}

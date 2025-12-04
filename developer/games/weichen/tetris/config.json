@@ -1,0 +1,9 @@
+{
+  "name": "Tetris Battle",
+  "version": "1.0.0",
+  "gameType": "GUI",
+  "maxPlayers": 2,
+  "description": "Classic Tetris with 2-player competitive mode",
+  "mainFile": "tetris_client.py",
+  "serverFile": "tetris_server.py"
+}

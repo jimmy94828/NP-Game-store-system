@@ -1,0 +1,9 @@
+{
+  "name": "Multiplayer Bingo",
+  "version": "1.0.0",
+  "gameType": "CLI",
+  "maxPlayers": 3,
+  "description": "Classic 5x5 Bingo game supporting 3 players",
+  "mainFile": "bingo_client.py",
+  "serverFile": "bingo_server.py"
+}
