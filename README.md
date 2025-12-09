@@ -135,7 +135,7 @@ Each game will have their own client.py, server.py, and config.json files to all
 
 ```bash
 # 1. Clone repository
-git clone [<repository-url>](https://github.com/jimmy94828/NP-Game-store-system)
+git clone https://github.com/jimmy94828/NP-Game-store-system
 cd NP-Game-store-system
 # 2. install pygame for GUI game
 pip install pygame
@@ -217,11 +217,11 @@ DEVELOPER_SERVER_PORT = 17049
 │   - Room Management      │   - Version control          │
 │   - Start game           |   - Template creation        |
 |   - Review and rating    │                              │
-└───────────┬──────────────┴─────────────┬────────────────┘
+└───────────↑──────────────┴─────────────↑────────────────┘
             │                            │
             │    TCP/IP + JSON + LPFP    │
             │                            │
-┌───────────▼────────────────────────────▼────────────────┐
+┌───────────↓────────────────────────────↓────────────────┐
 │              Server Side (140.113.17.11)                │
 ├──────────────────┬────────────────┬─────────────────────┤
 │  Database Server │  Lobby Server  │ Developer Server    │
@@ -229,11 +229,10 @@ DEVELOPER_SERVER_PORT = 17049
 │  - JSON storage  │  - Player ops  │ - Game upload       │
 │  - CRUDQ ops     │  - Start       | - File transfer     |
 |  - LPFP protocol |    GameServers │ - Manage Games      │
-└──────────────────┴────────────────┴─────────────────────┘
+└──────────────────┴───────↑────────┴─────────────────────┘
                            │
                            │ Start the game server
-                           ▼
-            ┌──────────────────────────────┐
+            ┌──────────────↓───────────────┐
             │   Dynamic Game Servers       │
             │   Ports: 10100-11000         │
             └──────────────────────────────┘
@@ -261,7 +260,7 @@ test/
 ├── player/
 │   ├── lobby_client.py          # Player client interface
 │   └── downloads/               # Downloaded games
-|       └──<player name>/
+|       └──<player name>/        # The folder to store player's downloaded games
 │           └── <game>/
 │               ├── config.json
 │               ├── <main_file>.py
@@ -275,7 +274,7 @@ test/
     │   ├── game_client.py
     │   └── config.json
     └── games/                   # Game development folders
-        ├── <developer name>/
+        ├── <developer name>/    # The folder for developer
         |   └── <game>/
         |       ├── config.json
         |       ├── <server_file>.py
