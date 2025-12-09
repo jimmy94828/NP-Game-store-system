@@ -239,34 +239,6 @@ DEVELOPER_SERVER_PORT = 17049
             └──────────────────────────────┘
 ```
 
-### Data Flow
-
-#### 1. Game Upload (Developer → Server)
-```
-Developer Client → Developer Server → Database Server
-                 ↓ (stores files)
-              server/games/<dev>/<game>/<version>/
-```
-
-#### 2. Game Download (Player → Server)
-```
-Player Client → Lobby Server → reads from server/games/
-            ← file transfer ← 
-```
-
-#### 3. Game Matchmaking
-```
-Player 1: Create Room → Lobby Server (assigns port from pool)
-Player 2: Join Room → Lobby Server (adds to room)
-Host: Start Game → Lobby Server spawns GameServer on assigned port
-            ↓
-    GameServer (port 10100-11000)
-            ↓
-Players connect directly → Game logic executes
-            ↓
-Game ends → Results to Lobby → Write to Database → GameLog
-```
-
 ## System Structure
 
 ```
