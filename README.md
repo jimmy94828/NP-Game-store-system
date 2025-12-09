@@ -136,7 +136,7 @@ Each game will have their own client.py, server.py, and config.json files to all
 ```bash
 # 1. Clone repository
 git clone [<repository-url>](https://github.com/jimmy94828/NP-Game-store-system)
-
+cd NP-Game-store-system
 # 2. install pygame for GUI game
 pip install pygame
 
