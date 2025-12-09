@@ -2,17 +2,6 @@
 #### 112550047 徐瑋晨
 在這次的作業中，我基於HW1和HW2所設計的遊戲和client/server架構建構出一個遊戲商城系統，此遊戲商城系統可以讓開發者開發遊戲並上傳到遊戲商城，開發者也可以在需要時更新或移除自己所上架的遊戲。而玩家則是可以在遊戲商城中瀏覽各個已經上架的遊戲，也可以下載自己想玩的遊戲並創立房間邀請其他玩家一起共同遊玩遊戲。
 
-## Table of Contents
-- [System Overview](#-system-overview)
-- [Start System](#-start-system)
-- [Installation](#-installation)
-- [Server Deployment](#-server-deployment)
-- [Client Usage](#-client-usage)
-- [System Architecture](#-system-architecture)
-- [Network Protocol](#-network-protocol)
-- [Demo Instructions](#-demo-instructions)
-- [Troubleshooting](#-troubleshooting)
-
 ## System Overview
 
 此遊戲商城系統主要可以分成三大部分，包含server端、client端和遊戲:
