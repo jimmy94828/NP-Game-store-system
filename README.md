@@ -17,254 +17,107 @@
 
 此遊戲商城系統主要可以分成三大部分，包含server端、client端和遊戲:
 
-### **Server端** 
+### **Server** 
 - **Database Server**: 
    - Database server主要負責所有關於資料庫的create, read, update, delete和query的處理，當database server收到來自lobby server或developer server對於資料庫的操作請求時，database server會檢查request的內容來判斷各個request是要對哪個欄位進行什麼操作，再根據request進行資料庫操作並回傳結果。database 會以.json的形式儲存，其中包含User、Gamelog、developer、game欄位，分別儲存玩家資訊、遊戲紀錄、開發者資訊和遊戲詳情。
 - **Lobby Server**:
    - Lobby server主要負責處理玩家的所有操作與需求，會接收來自lobby_client的request判斷需要針對database做什麼操作或是是否要啟動遊戲，再根據玩家的request傳送相對應的database request到database server，當玩家的每個request被lobby server處理完後，lobby server會回傳成功或是錯誤訊息給送出request的玩家。
 - **Developer Server**:
    - Developer server主要負責處理開發者的所有操作，包含創建遊戲、修改或上架遊戲、瀏覽詳細的遊戲資訊。Developer server匯處理developer相關的所有操作，並接收來自於developer發出的request，當developer server接收到來自developer發出的request時，會判斷每個request是關於什麼操作，如果request牽涉到database的create, read, update, delete, query，則developer會發送相對應的database request到database server進行資料庫操作。當developer server處理完每個request後，會根據職結果回傳相對應的訊息給發出request的developer。
-### **Client端**
-- **Player Client**: Browse games, create/join rooms, play games, rate & review
-- **Developer Client**: Upload games, manage versions, create from templates
+### **Client**
+- **Player Client**: 
+  在player登入後，會進入main menu:
+  ```
+  1. Game Store         -> 進入game store
+  2. Lobby              -> 進入lobby
+  3. Logout             -> 登出
+  4. Exit               -> 結束程式
+  ```
+  當player第一個選項進入Game Store時會看到game store menu:
+  ```
+  1. Browse Game Store        -> 查看game store裡面可以下載的遊戲
+  2. View Game Details        -> 查看game store中可下載遊戲的詳細資訊
+  3. Download/Update Game     -> 下載或更新遊戲
+  4. My Downloaded Games      -> 查看已下載的遊戲
+  5. Rate & Review Game       -> 對遊戲進行review和評分
+  0. Back                     -> 回到main menu
+  ```
+  而當player在main menu選擇第二個選項進入lobby時，會看到lobby menu:
+  ```
+  1. View Online Players      -> 查看線上玩家
+  2. View Active Rooms        -> 查看房間
+  3. Create Room & Play       -> 選擇要玩的遊戲創建房間並進入房間
+  4. Join Room & Play         -> 加入房間
+  5. View Invitations         -> 查看邀請
+  6. Accept Invitation        -> 接受邀請並進入房間
+  0. Back                     -> 回到main menu
+  ```
+   在player選擇3. Create Room & Play並成功進入房間後，該player會成為房間的host，並會看到host menu:
+   ```
+   1. Start Game               -> 開始遊戲
+   2. Invite Player            -> 邀請其他完機加入房間
+   3. Leave Room               -> 離開房間
+   ```
+   在player選擇4. Join Room & Play 或6. Accept Invitation並成功進入房間後，如果player不是該房間的創建者，則player會以非host的身分進入房間，會看到room menu並開始等待房間的host開始遊戲:
+   ```
+   1. Leave Room               -> 離開房間
+   ```
+  player 可以自由的在game store和lobby間進行切換來達到瀏覽遊戲->下載遊戲->選擇遊戲創建房間->邀請玩家->開始遊戲的流程，在遊戲結束時player會回到room。
+- **Developer Client**: 
+  在developer登入之後，developer會看到developer main menu:
+  ```
+  1. Upload New Game             -> 上傳新的遊戲
+  2. Update Existing Game        -> 更新現在在game server上的遊戲
+  3. Remove Game                 -> 移除game store上的遊戲
+  4. List My Games               -> 列出自己所有的遊戲(包含已移除版本)
+  5. Create Game from Template   -> 由template新增遊戲框架
+  6. Logout                      -> 登出
+  0. Exit                        -> 結束程式
+  ```
 
 ### **Supported Games**
-#### Connect Four
+#### Extened Connect Four
   - **Type**: CLI
   - **Players**: 2
   - **Dependencies**: None (standard library)
-  - **Description**: Classic Connect Four strategy game
-  - **Features**: 6x7 board, gravity-based drops, win detection
+  - **Description**: Extened Connect Four game allow two player to play in turn
+  - **Rule**: 6x7 board, two players put a piece in turn until game end.
+  - **Finish condition**: When a player's four pieces form a connected horizontal, vertical, diagonal line, the game will finish. If the board is full and there does exist any free space to put a new piece, the game will also finish (draw).
 
 #### Multiplayer Bingo
   - **Type**: CLI
-  - **Players**: 3-5 (dynamic)
+  - **Players**: 3
   - **Dependencies**: None (standard library)
-  - **Description**: 5x5 Bingo with customizable player count
-  - **Features**: Random card generation, turn-based calling, multiple winning patterns
+  - **Description**: 5x5 Bingo game allows three players to play and call the number in turn.
+  - **Rule**: Each player's bingo card is randomly generated and the numbers are in range 1~75. Players will call a number in turn until game finishes. The called number can not be called again.
+  - **Finish condition**: When a player's board has five number be called and those five called numbers form a vertical, horizontal, or diagonal line, the game will end.
 
 #### Tetris Battle
   - **Type**: GUI
   - **Players**: 2
-  - **Dependencies**: `pygame` (install with `pip3 install pygame`)
-  - **Description**: Competitive Tetris with real-time gameplay
-  - **Features**: Classic Tetris mechanics, 2-player battle mode, pygame graphics
+  - **Dependencies**: `pygame` (install with `pip install pygame`)
+  - **Description**: Classical GUI Tetris game allow player to use keyboard to control the block's movement.
+  - **Rule**: Two player can control the movement of block using keyboard:
+   ```
+   left/right  : Move left or right
+   up          : Rotate clockwise
+   N           : Rotate counter-clockwise
+   down        : Soft Drop
+   B           : Hard Drop
+   SPACE       : Hold
+   ESC         : Quit
+   ```
+   When the block fill a horizontal line in the board, the line will be cleared and the score will increase based on how many lines is cleared at the same time:
+   ```
+   {1: 100, 2: 300, 3: 500, 4: 800}
+   ```
+   As the remaining time of the game decrease, the dropping speed of each block will increase to increase the difficulty of the game.
+  - **Finish condition**: 
+   The time limit of the game is set to 3 minutes and the player with higher score will be the winner of the game. If the next block generated can not be dropped into the board (the board do not have enough space for the new block to drop), the player's game will also finish.
 
-**Note**: GUI games require `pygame` installation on player's machine.
-
----
-
-## Start System
-
-### For TAs (Demo Setup)
-
-```bash
-# 1. Clone repository
-git clone [<repository-url>](https://github.com/jimmy94828/NP-Game-store-system)
-cd test
-
-# 2. Install pygame (required for GUI games like Tetris)
-pip3 install pygame
-
-# 3. Start Player Client
-./start_player.py
-
-# 4. Start Developer Client (in another terminal)
-./start_developer.py
-```
-
-**Dependencies**: 
-- Python 3.8+ (standard library only for server/CLI games)
-- pygame (required for GUI games like Tetris)
-
----
-
-## Installation
-
-### Prerequisites
-- **Python 3.8+**
-- **Linux/macOS/Windows** with WSL
-- **Network connectivity** to server
-
-### Required Packages
-
-#### For Players (GUI Games)
-If you want to play **GUI games** like Tetris, you need pygame:
-
-```bash
-# Install pygame for GUI games
-pip3 install pygame
-```
-
-#### For Developers/Servers
-No external packages required - uses only Python standard library.
-
-### Environment Setup
-
-```bash
-# Verify Python version
-python3 --version
-
-# Make scripts executable
-chmod +x start_server.py start_player.py start_developer.py
-
-# Optional: Create virtual environment (recommended)
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install pygame if playing GUI games
-pip3 install pygame
-```
-
-### Quick Installation Script
-
-```bash
-# All-in-one setup
-chmod +x start_*.py && pip3 install pygame
-```
-
----
-
-## Server Deployment
-
-### Deployment on Linux Machine (140.113.203.91)
-
-#### 1. Initial Setup
-```bash
-# SSH to server
-ssh <username>@140.113.203.91
-
-# Navigate to project directory
-cd /path/to/test
-
-# Make server executable
-chmod +x start_server.py
-```
-
-#### 2. Start All Servers
-```bash
-# Start in background with nohup (survives SSH disconnection)
-nohup ./start_server.py > server.log 2>&1 &
-
-# Or use screen/tmux for persistent session
-screen -S gameserver
-./start_server.py
-# Press Ctrl+A, D to detach
-```
-
-#### 3. Verify Server Status
-```bash
-# Check if servers are running
-ps aux | grep "start_server.py"
-
-# Check ports are listening
-netstat -tuln | grep -E "17047|17048|17049"
-
-# View logs
-tail -f server.log
-```
-
-#### 4. Clear Database (Before Demo)
-```bash
-# Remove database file
-rm -f database.json
-# Server will create fresh database.json on restart
-```
-
-#### 5. Server Management
-```bash
-# Stop servers
-pkill -f start_server.py
-
-# Restart servers
-./start_server.py
-
-# Check server health
-curl http://localhost:17048  # Should show connection
-```
-
-### Server Configuration
-
-Default ports (edit in respective files if needed):
-- `server/database_server.py`: Port 17047
-- `server/lobby_server.py`: Port 17048
-- `server/developer_server.py`: Port 17049
-
----
-
-## Client Usage
-
-### Player Client
-
-```bash
-./start_player.py
-```
-
-#### Connection Settings
-Edit `player/lobby_client.py` if server is on different host:
-```python
-LOBBYSERVER_HOST = '140.113.203.91'  # Change to your server IP
-LOBBYSERVER_PORT = 17048
-```
-
-#### Player Features
-1. **Register/Login**: Create account or login
-2. **Browse Store**: View available games with ratings
-3. **Download Games**: Get latest game versions
-4. **Create Room**: Host a game session
-5. **Join Room**: Join existing game rooms
-6. **Start Game**: Launch game when room is full
-7. **Rate & Review**: Submit feedback (only after playing)
-8. **View Game Logs**: Check match history
-
-#### Example Flow
-```
-1. Register account (user1)
-2. Browse store → Select "Connect Four"
-3. Download game
-4. Create room → Select "Connect Four"
-5. Wait for player 2 to join
-6. Start game
-7. Play Connect Four
-8. Rate game after completion
-```
-
-### Developer Client
-
-```bash
-./start_developer.py
-```
-
-#### Connection Settings
-Edit `developer/developer_client.py` if server is on different host:
-```python
-DEVELOPER_SERVER_HOST = '140.113.203.91'  # Change to your server IP
-DEVELOPER_SERVER_PORT = 17049
-```
-
-#### Developer Features
-1. **Register/Login**: Create developer account
-2. **Upload Game**: Upload new game with config
-3. **Update Game**: Push new version
-4. **List Games**: View published games
-5. **Remove Game**: Delist game
-6. **Create Template**: Generate game skeleton
-
-#### Upload Game Workflow
-```
-1. Login as developer
-2. Create game folder in developer/games/<dev_name>/<game_name>/
-3. Add required files:
-   - config.json (game metadata)
-   - <server_file>.py (game server)
-   - <main_file>.py (game client)
-4. Select "Upload Game" → Choose game folder
-5. Configure metadata (name, version, description, etc.)
-6. System validates files and config
-7. Upload completed → Players can download
-```
-
-#### Config.json Format
+**Note**: The new game can be created if the developer follow the format of template.
+Each game will have their own client.py, server.py, and config.json files to allow each game can be started by server correctly.
+#### Config.json Format example
 ```json
 {
   "name": "Game Name",
@@ -276,21 +129,98 @@ DEVELOPER_SERVER_PORT = 17049
   "serverFile": "game_server.py"
 }
 ```
-
-**Validation Rules:**
 - Version must be `x.y.z` format
-- `mainFile` and `serverFile` must exist
+- `mainFile` and `serverFile` must be python file
 - `maxPlayers` must be positive integer
 - All fields are required
-
 ---
+
+## Start System
+
+### Setup
+**Dependencies**: 
+- Python 3.8+ (standard library only for server/CLI games)
+- pygame (required for GUI games like Tetris)
+
+#### download the code and setup environment
+
+```bash
+# 1. Clone repository
+git clone [<repository-url>](https://github.com/jimmy94828/NP-Game-store-system)
+
+# 2. install pygame for GUI game
+pip install pygame
+
+# 3. start servers
+chmod +x start_server.py
+./start_server.py
+
+# 4. Start Player Client (in other terminal)
+chmod +x start_player.py
+./start_player.py
+
+# 5. Start Developer Client (in another terminal)
+chmod +x start_developer.py
+./start_developer.py
+```
+---
+
+### Connections
+
+#### Servers
+Default ports:
+- `server/database_server.py`: Port 17047
+- `server/lobby_server.py`: Port 17048
+- `server/developer_server.py`: Port 17049
+
+#### Player client
+```python
+LOBBYSERVER_HOST = '140.113.17.11'
+LOBBYSERVER_PORT = 17048
+```
+
+#### Developer client
+```python
+DEVELOPER_SERVER_HOST = '140.113.17.11'
+DEVELOPER_SERVER_PORT = 17049
+```
+---
+
+### Example Flows
+#### Player Play Game flow
+```
+1.  Register account and login
+2.  Go to Game store
+3.  Browse store -> Select "Extend Connect Four"
+4.  Download game
+5.  Go to Lobby
+6.  Create room -> Select "Extend Connect Four"
+7.  Wait for player 2 to join
+8.  Start game
+9.  Play Connect Four
+10. Return to room after game finishes
+```
+
+#### Developer Upload Game flow
+```
+1. Login as developer
+2. Create game folder in developer/games/<dev_name>/<game_name>/
+3. Add required files:
+   - config.json (game metadata)
+   - <server_file>.py (game server)
+   - <main_file>.py (game client)
+4. Select "Upload Game" -> Select the game folder to upload
+5. Configure metadata (name, version, description, etc.)
+6. System validates files and config
+7. Upload completed -> Players can download
+```
 
 ## System Architecture
 
 ### Component Diagram
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Client Side (Local)                  │
+│                    Client Side                          │
 ├──────────────────────────┬──────────────────────────────┤
 │   Player Client          │   Developer Client           │
 │   - lobby_client.py      │   - developer_client.py      │
@@ -300,25 +230,23 @@ DEVELOPER_SERVER_PORT = 17049
 |   - Review and rating    │                              │
 └───────────┬──────────────┴─────────────┬────────────────┘
             │                            │
-            │ TCP/IP + JSON Protocol     │
+            │    TCP/IP + JSON + LPFP    │
             │                            │
 ┌───────────▼────────────────────────────▼────────────────┐
-│              Server Side (140.113.203.91)               │
+│              Server Side (140.113.17.11)                │
 ├──────────────────┬────────────────┬─────────────────────┤
 │  Database Server │  Lobby Server  │ Developer Server    │
 │  Port: 17047     │  Port: 17048   │ Port: 17049         │
-│  - JSON storage  │  - Rooms       │ - Game upload       │
-│  - CRUD ops      │  - GameServers │ - File transfer     │
-│  - LPFP protocol │  - Port pool   │ - Version mgmt      │
+│  - JSON storage  │  - Player ops  │ - Game upload       │
+│  - CRUDQ ops     │  - Start       | - File transfer     |
+|  - LPFP protocol |    GameServers │ - Manage Games      │
 └──────────────────┴────────────────┴─────────────────────┘
                            │
-                           │ Spawns game instances
+                           │ Start the game server
                            ▼
             ┌──────────────────────────────┐
             │   Dynamic Game Servers       │
             │   Ports: 10100-11000         │
-            │   - Per-match instances      │
-            │   - Auto-cleanup on end      │
             └──────────────────────────────┘
 ```
 
@@ -350,196 +278,58 @@ Players connect directly → Game logic executes
 Game ends → Results to Lobby → Write to Database → GameLog
 ```
 
-### Module Breakdown
-
-#### Server Side
-- **`server/database_server.py`**: JSON persistence, LPFP protocol
-- **`server/lobby_server.py`**: Room management, game orchestration
-- **`server/developer_server.py`**: Game upload/update handling
-
-#### Player Side
-- **`player/lobby_client.py`**: Main player interface
-- **`player/games/<game>/<game_client.py>`**: Downloaded game clients
-
-#### Developer Side
-- **`developer/developer_client.py`**: Developer interface
-- **`developer/games/<dev>/<game>/`**: Game development folders
-- **`developer/template/`**: Game skeleton templates
-
-#### Game Servers
-- **`developer/games/<dev>/<game>/<server>.py`**: Game server logic
-- Launched dynamically by Lobby Server
-- Clean up after match ends
-
----
-
-##  Network Protocol
-
-### LPFP Protocol (Length-Prefixed Framing Protocol)
-
-All client-server communication uses LPFP:
-
-```
-┌─────────────┬──────────────────────────┐
-│   Header    │         Payload          │
-│  4 bytes    │       N bytes            │
-│ (uint32_t)  │    (JSON UTF-8)          │
-└─────────────┴──────────────────────────┘
-```
-
-#### Message Format
-- **Header**: 4-byte unsigned integer (network byte order)
-- **Payload**: JSON object encoded in UTF-8
-- **Max Size**: 65536 bytes per message
-
-#### Example Messages
-
-**Player Login:**
-```json
-{
-  "command": "login",
-  "username": "player1",
-  "password": "hashed_password"
-}
-```
-
-**Create Room:**
-```json
-{
-  "command": "create_room",
-  "userId": "player1",
-  "gameId": "game_123"
-}
-```
-
-**Game State Update:**
-```json
-{
-  "type": "game_state",
-  "current_player": 1,
-  "board": [[0,0,0], ...],
-  "winner": null
-}
-```
-
-### Error Handling
-- **Connection Lost**: Client shows error, returns to menu
-- **Invalid Message**: Server sends error response with message
-- **Timeout**: 30-second socket timeout on operations
-- **Port Exhaustion**: Lobby queues room creation
-
----
-
-## Demo Instructions
-
-#### setup
-1. **Clone repository** from GitHub https://github.com/jimmy94828/NP-Game-store-system
-2. **install python3 and pygame**
-   
-3. **Start clients**:
-   ```bash
-   ./start_player.py      # Player client
-   ./start_developer.py   # Developer client
-   ```
-
-### Demo Scenarios
-
-#### Scenario 1: Developer Workflow
-```
-1. Run ./start_developer.py
-2. Register developer account (dev1)
-3. Login
-4. Upload "Multiplayer Bingo" game
-   - Select game folder
-   - Verify config.json validation
-   - Upload completes successfully
-5. List games to verify upload
-6. Update game version (2.0.0 → 2.0.1)
-7. Remove game (optional)
-```
-
-#### Scenario 2: Player Workflow
-```
-1. Run ./start_player.py (2 terminals)
-2. Terminal 1: Register player1, login
-3. Terminal 2: Register player2, login
-4. Both: Browse store, view "Connect Four"
-5. Both: Download "Connect Four"
-6. Player1: Create room, select "Connect Four"
-7. Player2: List rooms, join player1's room
-8. Player1: Start game
-9. Both: Play Connect Four
-10. Winner: Game ends, results saved
-11. Both: Rate and review game
-```
-
-#### Scenario 3: Multi-player Bingo (3-5 players)
-```
-1. Run ./start_player.py (3-5 terminals)
-2. All: Register/Login
-3. All: Download "Multiplayer Bingo"
-4. Player1: Create room, select "Multiplayer Bingo"
-5. Players 2-5: Join room
-6. Player1: Start game (when 3-5 players ready)
-7. All: Take turns calling numbers
-8. First to complete line wins
-```
-
----
-
 ## System Structure
 
 ```
 test/
-├── README.md                    # This file
+├── README.md                    # README file (This file)
 ├── start_server.py              # Server startup script
 ├── start_player.py              # Player client launcher
 ├── start_developer.py           # Developer client launcher
 ├── clear_database.py            # Database cleanup script
 ├── validate_system.py           # System validation tool
 ├── database.json                # Persistent data store
-│
 ├── server/
 │   ├── database_server.py       # Database server (port 17047)
 │   ├── lobby_server.py          # Lobby server (port 17048)
 │   ├── developer_server.py      # Developer server (port 17049)
-│   └── games/                   # Uploaded games storage
-│       └── <dev>/
-│           └── <game>/
-│               └── <version>/
+│   └── uploaded_games/          # Uploaded games storage   
+│       └── <game>/
+│           └── <version>/
 │
 ├── player/
 │   ├── lobby_client.py          # Player client interface
-│   └── games/                   # Downloaded games
-│       └── <game>/
-│           ├── config.json
-│           ├── <main_file>.py
-│           └── version.txt
-│
+│   └── downloads/               # Downloaded games
+|       └──<player name>/
+│           └── <game>/
+│               ├── config.json
+│               ├── <main_file>.py
+│               ├── <Server_file>.py
+│               └── version.txt
 └── developer/
     ├── developer_client.py      # Developer client interface
+    ├── Create_game_template.py  # Create template
     ├── template/                # Game templates
     │   ├── game_server.py
     │   ├── game_client.py
     │   └── config.json
     └── games/                   # Game development folders
-        └── <dev>/
-            └── <game>/
+        ├── <developer name>/
+        |   └── <game>/
+        |       ├── config.json
+        |       ├── <server_file>.py
+        |       └── <main_file>.py
+        └── weichen/             # Three supported games
+            ├── bingo
+            │   ├── bingo_client.py
+            │   ├── bingo_server.py
+            │   └── config.json
+            ├── connect_four
+            │   ├── config.json
+            │   ├── connect_four_client.py
+            │   └── connect_four_server.py
+            └── tetris
                 ├── config.json
-                ├── <server_file>.py
-                ├── <main_file>.py
-                └── README.md
+                ├── tetris_client.py
+                └── tetris_server.py
 ```
----
-
-## Development Notes
-
-### Adding New Games
-1. Create game folder: `developer/games/<dev>/<game>/`
-2. Create required files:
-   - `config.json`: Game metadata
-   - `<server>.py`: Game server logic
-   - `<client>.py`: Game client interface
-3. Use developer client to upload
-4. Players can download and play
-
