@@ -128,7 +128,7 @@ Each game will have their own client.py, server.py, and config.json files to all
 
 ### Setup
 **Dependencies**: 
-- Python 3.8+ (standard library only for server/CLI games)
+- Python 3.10+ (standard library only for server/CLI games)
 - pygame (required for GUI games like Tetris)
 
 #### download the code and setup environment
