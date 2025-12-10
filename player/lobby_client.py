@@ -1281,10 +1281,6 @@ class EnhancedLobbyClient:
         
         self.running = True
         logged_in = False
-        
-        print("\n" + "="*60)
-        print(" " * 15 + "GAME STORE SYSTEM")
-        print("=" * 60)
         try:
             while self.running:
                 if not logged_in:

@@ -741,11 +741,12 @@ class DeveloperClient:
         
         self.running = True
         logged_in = False
-        print("\n" + "="*50)
-        print("         Game Developer Platform")        
+              
         try:
             while self.running:
                 if not logged_in:
+                    print("\n" + "="*50)
+                    print("         Game Developer Platform")  
                     print("\n1. Register")
                     print("2. Login")
                     print("0. Exit")
