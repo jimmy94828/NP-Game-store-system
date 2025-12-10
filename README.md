@@ -157,6 +157,7 @@ chmod +x start_developer.py
 ### Connections
 
 #### Servers
+Run on Linux1 server: 140.113.17.11
 Default ports:
 - `server/database_server.py`: Port 17047
 - `server/lobby_server.py`: Port 17048
