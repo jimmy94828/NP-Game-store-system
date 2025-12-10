@@ -181,6 +181,7 @@ class DeveloperServer:
             return {'status': 'error', 'message': str(error)}
     
     def handle_client(self, client_socket):         # handle individual developer client connection
+        dev_id = None
         try:
             while True:
                 request = recv_message(client_socket)
@@ -192,6 +193,8 @@ class DeveloperServer:
                     response = self.register_developer(request)
                 elif command == 'dev_login':
                     response = self.login_developer(request)
+                    if response['status'] == 'success':
+                        dev_id = response.get('devId')
                 elif command == 'upload_game':
                     response = self.upload_game(client_socket, request)
                 elif command == 'update_game':
@@ -210,6 +213,19 @@ class DeveloperServer:
         except Exception as error:
             print(f"[DevServer] Error handling client: {error}")
         finally:
+            # set developer offline when disconnected
+            if dev_id is not None:
+                try:
+                    self.database_request({
+                        'collection': 'Developer',
+                        'action': 'update',
+                        'data': {
+                            'id': dev_id,
+                            'fields': {'online': 0}
+                        }
+                    })
+                except Exception as e:
+                    print(f"[DevServer] Error setting developer offline: {e}")
             client_socket.close()
     
     def register_developer(self, request):          # developer registration
@@ -240,8 +256,25 @@ class DeveloperServer:
         dev = response['data'][0]
         password_hash = hashlib.sha256(request['password'].encode()).hexdigest()
         
+        # check if developer is already online
+        if dev.get('online', 0) == 1:
+            return {'status': 'error', 'message': 'Developer already logged in'}
+        
         if dev['password_hashed'] != password_hash:
             return {'status': 'error', 'message': 'Invalid password'}
+        
+        # set developer online status to 1
+        update_response = self.database_request({
+            'collection': 'Developer',
+            'action': 'update',
+            'data': {
+                'id': dev['id'],
+                'fields': {'online': 1}
+            }
+        })
+        
+        if update_response['status'] != 'success':
+            return {'status': 'error', 'message': 'Failed to update online status'}
         
         return {'status': 'success', 'message': 'Login successful', 'devId': dev['id']}
     

@@ -238,7 +238,8 @@ class DatabaseServer:
                         'id': dev_id,
                         'name': data['name'],
                         'password_hashed': password,
-                        'createdAt': datetime.now().isoformat()
+                        'createdAt': datetime.now().isoformat(),
+                        'online': 0
                     }
                     
                     if 'Developer' not in self.data:
@@ -261,6 +262,8 @@ class DatabaseServer:
                         if 'id' in data and dev['id'] != data['id']:
                             match = False
                         if 'name' in data and dev['name'] != data['name']:
+                            match = False
+                        if 'online' in data and dev.get('online', 0) != data['online']:
                             match = False
                         if match:
                             results.append(dev)

@@ -147,6 +147,7 @@ class DeveloperClient:
         
         if response and response['status'] == 'success':
             print(f"Registration successful! Developer ID: {response['devId']}")
+            print("Please login to continue.")
             return True
         else:
             print(f"Registration failed: {response.get('message', 'Unknown error')}")

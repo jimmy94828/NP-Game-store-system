@@ -237,6 +237,7 @@ class EnhancedLobbyClient:
         
         if response and response['status'] == 'success':
             print(f"Registration successful! User ID: {response['userId']}")
+            print("Please login to continue.")
             return True
         else:
             print(f"Registration failed: {response.get('message', 'Unknown error')}")
@@ -1287,6 +1288,9 @@ class EnhancedLobbyClient:
         try:
             while self.running:
                 if not logged_in:
+                    print("\n" + "="*60)
+                    print(" " * 15 + "GAME STORE SYSTEM")
+                    print("=" * 60)
                     print("\n1. Register")
                     print("2. Login")
                     print("0. Exit")
