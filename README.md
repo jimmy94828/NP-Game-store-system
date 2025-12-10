@@ -2,6 +2,13 @@
 #### 112550047 徐瑋晨
 在這次的作業中，我基於HW1和HW2所設計的遊戲和client/server架構建構出一個遊戲商城系統，此遊戲商城系統可以讓開發者開發遊戲並上傳到遊戲商城，開發者也可以在需要時更新或移除自己所上架的遊戲。而玩家則是可以在遊戲商城中瀏覽各個已經上架的遊戲，也可以下載自己想玩的遊戲並創立房間邀請其他玩家一起共同遊玩遊戲。
 
+## Table of Contents
+- [System Overview](#system-overview)
+- [Supported Games](#supported-games)
+- [Start System](#start-system)
+- [System Architecture](#system-architecture)
+- [System Structure](#system-structure)
+
 ## System Overview
 
 此遊戲商城系統主要可以分成三大部分，包含server端、client端和遊戲:
@@ -53,15 +60,17 @@
    ```
   player 可以自由的在game store和lobby間進行切換來達到瀏覽遊戲->下載遊戲->選擇遊戲創建房間->邀請玩家->開始遊戲的流程，在遊戲結束時player會回到room。
 - **Developer Client**: 
+  當developer成功登入後，會在`/developer/games/<developer_name>/`看到自己所開發的遊戲資料夾，一開始是空的，而在`developer/games/weichen`中也會有三個已經支援的遊戲範例，分別是Extend Connect Four、Multiplayer Bingo和Tetris Battle，developer可以參考這三個遊戲的格式來開發自己的遊戲。developer也可以直接手動複製這三個遊戲的資料夾到自己的developer資料夾中來進行修改和上傳。
+  在developer選擇上傳遊戲時，developer需要選擇遊戲的資料夾並上傳該遊戲，系統會根據遊戲中的config.json來驗證遊戲的格式是否正確，如果格式正確則會將遊戲上傳到game server中，否則會回傳錯誤訊息給developer。在developer選擇更新遊戲時，developer需要選擇已經上傳到game server中的遊戲並選擇要更新的版本，系統會根據遊戲中的config.json來驗證遊戲的格式是否正確，如果格式正確則會將遊戲更新到game server中，否則會回傳錯誤訊息給developer。在developer選擇移除遊戲時，developer需要選擇已經上傳到game server中的遊戲並確認移除該遊戲，系統會將該遊戲從game server中移除但仍然保留在database中以供developer查看。在developer選擇列出自己的遊戲時，系統會列出該developer所開發的所有遊戲包含已經移除的版本。在developer選擇由template新增遊戲框架時，系統會在`developer/games/<developer_name>/`中建立一個新的遊戲資料夾並複製template中的檔案到該資料夾中以供developer進行開發。
   在developer登入之後，developer會看到developer main menu:
   ```
-  1. Upload New Game             -> 上傳新的遊戲
-  2. Update Existing Game        -> 更新現在在game server上的遊戲
-  3. Remove Game                 -> 移除game store上的遊戲
-  4. List My Games               -> 列出自己所有的遊戲(包含已移除版本)
-  5. Create Game from Template   -> 由template新增遊戲框架
-  6. Logout                      -> 登出
-  0. Exit                        -> 結束程式
+  1. Check My Game / Upload New Game  -> 查看並上傳新的遊戲
+  2. Update Existing Game             -> 更新現在在game server上的遊戲
+  3. Remove Game                      -> 移除game store上的遊戲
+  4. List My Uploaded Games           -> 列出自己上傳過的遊戲(包含已移除版本)
+  5. Create Game from Template        -> 由template新增遊戲框架
+  6. Logout                           -> 登出
+  0. Exit                             -> 結束程式
   ```
 
 ### **Supported Games**
@@ -140,11 +149,11 @@ cd NP-Game-store-system
 # 2. install pygame for GUI game
 pip install pygame
 
-# 3. start servers
+# 3. start servers run on server 140.113.17.11
 chmod +x start_server.py
 ./start_server.py
 
-# 4. Start Player Client (in other terminal)
+# 4. Start Player Client (in another terminal)
 chmod +x start_player.py
 ./start_player.py
 

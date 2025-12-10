@@ -118,10 +118,10 @@ class DeveloperClient:
         print("=== Developer Client - Main Menu ===")
         print(f"Logged in as: {self.username} (Dev ID: {self.dev_id})")
         print()
-        print("1. Upload New Game")
+        print("1. Check My Game / Upload New Game")
         print("2. Update Existing Game")
         print("3. Remove Game")
-        print("4. List My Games")
+        print("4. List My Uploaded Games")
         print("5. Create Game from Template")
         print("6. Logout")
         print("0. Exit")
@@ -175,7 +175,21 @@ class DeveloperClient:
             self.username = username
             try:                                        # create per-developer games directory
                 self.games_dir = os.path.join(self.games_root, self.username)
+                check = not os.path.exists(self.games_dir)              # auto load three supported games
                 os.makedirs(self.games_dir, exist_ok=True)
+                if check:
+                    ssupport_dir = os.path.join(self.games_root, 'weichen')
+                    if os.path.exists(ssupport_dir):
+                        import shutil
+                        for game in ['bingo', 'connect_four', 'tetris']:
+                            source = os.path.join(ssupport_dir, game)
+                            distination = os.path.join(self.games_dir, game)
+                            if os.path.exists(source) and not os.path.exists(distination):
+                                try:
+                                    shutil.copytree(source, distination)
+                                    print(f"Copied supported game: {game}")
+                                except Exception as e:
+                                    print(f"Warning: failed to copy {game}: {e}")
             except Exception:
                 print(f"Warning: failed to create developer games directory '{self.games_dir}'")
 
@@ -207,7 +221,7 @@ class DeveloperClient:
             print(f"{i}. {game}")
         
         try:
-            choice = int(input("\nSelect game number: ").strip())
+            choice = int(input("\nSelect game number (Enter to return): ").strip())
             if choice < 1 or choice > len(local_games):
                 print("Invalid selection")
                 return
@@ -278,6 +292,16 @@ class DeveloperClient:
                         continue
                     else:
                         print(f"     Version format validated: {value}")
+                
+                if field_name == 'maxPlayers':              # maxPlayers validation
+                    try:
+                        max_players = int(value)
+                        if max_players < 2:
+                            print("     Maximum players must be at least 2")
+                            continue
+                    except ValueError:
+                        print("     Please enter a valid number for maximum players")
+                        continue
                 
                 if field_name in ['mainFile', 'serverFile']:        # file existence validation
                     file_path = os.path.join(game_path, value)
@@ -509,7 +533,7 @@ class DeveloperClient:
         # Prompt for each required field
         print(f"\n=== Update Game Configuration ===")
         print(f"Current game version in database: {game['currentVersion']}")
-        print("\nPlease enter the following information (all fields required):\n")
+        print("\nPlease input the following information (all fields required \n enter to keep value in []):\n")
         
         required_fields = [
             ('name', 'Game Name', 'string'),
