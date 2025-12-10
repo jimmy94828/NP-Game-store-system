@@ -16,12 +16,21 @@
 ### **Server** 
 - **Database Server**: 
    - Database server主要負責所有關於資料庫的create, read, update, delete和query的處理，當database server收到來自lobby server或developer server對於資料庫的操作請求時，database server會檢查request的內容來判斷各個request是要對哪個欄位進行什麼操作，再根據request進行資料庫操作並回傳結果。database 會以.json的形式儲存，其中包含User、Gamelog、developer、game欄位，分別儲存玩家資訊、遊戲紀錄、開發者資訊和遊戲詳情。
+   - 當server啟動時，database server會讀取`database.json`來載入資料庫，當server關閉時，database server會將目前的資料庫內容寫回`database.json`來達到資料持久化的目的。
   
 - **Lobby Server**:
    - Lobby server主要負責處理玩家的所有操作與需求，會接收來自lobby_client的request判斷需要針對database做什麼操作或是是否要啟動遊戲，再根據玩家的request傳送相對應的database request到database server，當玩家的每個request被lobby server處理完後，lobby server會回傳成功或是錯誤訊息給送出request的玩家。
+   - 當玩家選擇開始遊戲時，lobby server會根據該遊戲的config.json來啟動相對應的game server，並將該game server的host和port資訊回傳給所有進入該遊戲房間的玩家，讓玩家可以啟動對應的遊戲client端連接到該game server進行遊戲。
+   - 在每次開始遊戲前，lobby server會先檢查房間內各個玩家的遊戲版本是否和game server的版本相同，如果有玩家的遊戲版本和game server不相同時，lobby server會顯示版本號的差異並自動為每位玩家更新遊戲到最新版本，確保所有玩家的遊戲版本和game server相同後才會啟動game server。
+   - 如果lobby server在啟動game server時發生錯誤(如遊戲遭developer移除)，lobby server會將錯誤訊息回傳給房間所有玩家，並讓玩家回到room等待host重新啟動遊戲或是退出房間。
+   - 當遊戲結束後，lobby server會接收來自game server的遊戲結果，並將遊戲結果記錄在database中，最後將遊戲結果回傳給所有參與該遊戲的玩家。所有玩家在收到遊戲結果後會回到room並可以選擇繼續遊戲或是離開房間。
+   - 在玩家玩過遊戲後，玩家可以在game store中對遊戲進行評分和review，lobby server會將玩家的評分和review記錄在database中，並在遊戲的詳細資訊中顯示該遊戲的平均評分和所有玩家的review內容。如果玩家未玩先評分或review遊戲，lobby server會拒絕該request並回傳錯誤訊息給玩家。
   
 - **Developer Server**:
-   - Developer server主要負責處理開發者的所有操作，包含創建遊戲、修改或上架遊戲、瀏覽詳細的遊戲資訊。Developer server匯處理developer相關的所有操作，並接收來自於developer發出的request，當developer server接收到來自developer發出的request時，會判斷每個request是關於什麼操作，如果request牽涉到database的create, read, update, delete, query，則developer會發送相對應的database request到database server進行資料庫操作。當developer server處理完每個request後，會根據職結果回傳相對應的訊息給發出request的developer。
+   - Developer server主要負責處理開發者的所有操作，包含創建遊戲、修改或上架遊戲、瀏覽詳細的遊戲資訊。Developer server匯處理developer相關的所有操作，並接收來自於developer發出的request，當developer server接收到來自developer發出的request時，會判斷每個request是關於什麼操作，如果request牽涉到database的create, read, update, delete, query，則developer會發送相對應的database request到database server進行資料庫操作。當developer server處理完每個request後，會根據結果回傳相對應的訊息給發出request的developer。
+   - developer server也會處理開發者上傳遊戲的request，當developer選擇上傳遊戲時，developer server會根據遊戲中的config.json來驗證遊戲的格式是否正確，如果格式正確則會將遊戲上傳到server端的`uploaded_games/`資料夾中，並在database中新增該遊戲的資訊。
+   - 如果developer選擇更新遊戲版本，developer server會將新的遊戲版本上傳到`uploaded_games/`資料夾中，並在database中更新該遊戲的版本資訊。如果developer選擇移除遊戲，developer server會將該遊戲從`uploaded_games/`資料夾中刪除，並在database中將該遊戲標記為已移除狀態。
+   - 在上傳新遊戲與更新遊戲時，developer server會檢查現在的版本是否和過去的版本有衝突，如果有衝突則會拒絕該request並回傳錯誤訊息給developer，確保每個遊戲的版本號都是不相同的。
   
 ### **Client**
 - **Player Client**: 
@@ -34,7 +43,7 @@
   ```
   當player第一個選項進入Game Store時會看到game store menu:
   ```
-  1. Browse Game Store        -> 查看game store裡面可以下載的遊戲
+  1. Browse Game Store        -> 查看game store裡面所有可以下載的遊戲
   2. View Game Details        -> 查看game store中可下載遊戲的詳細資訊
   3. Download/Update Game     -> 下載或更新遊戲
   4. My Downloaded Games      -> 查看已下載的遊戲
@@ -61,7 +70,10 @@
    ```
    1. Leave Room              -> 離開房間
    ```
-  player 可以自由的在game store和lobby間進行切換來達到瀏覽遊戲->下載遊戲->選擇遊戲創建房間->邀請玩家->開始遊戲的流程，在遊戲結束時player會回到room。
+  player 可以自由的在game store和lobby間進行切換來達到瀏覽遊戲->下載遊戲->選擇遊戲創建房間->邀請玩家->開始遊戲的流程，在遊戲結束時player會回到room並可以選擇繼續遊戲或是離開房間。
+  
+  在系統中，player下載的遊戲會被儲存在`player/downloads/<player_name>/`資料夾中，當player選擇下載遊戲時，系統會將遊戲從server端的`uploaded_games/`資料夾中複製到player的下載資料夾中，並在下載資料夾中建立一個version.txt來記錄該遊戲的版本號，當player選擇更新遊戲時，系統會檢查下載資料夾中的version.txt來判斷目前的版本號是否和server端的版本號相同，如果版本號不同則會將遊戲更新到最新版本並更新version.txt中的版本號。
+
 - **Developer Client**: 
   在developer登入之後，developer會看到developer main menu:
   ```
