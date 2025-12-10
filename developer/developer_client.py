@@ -101,17 +101,25 @@ class DeveloperClient:
             print(f"Failed to connect: {error}")
             return False
     
-    def send_command(self, command, data=None):         # send a command to developer server
+    def send_command(self, command, data=None):     # send a command to the server and wait for response
         try:
             request = {'command': command}
             if data:
                 request.update(data)
             send_message(self.socket, request)
             response = recv_message(self.socket)
+            if response is None:
+                print("\n[Error] Server disconnected. Exiting...")
+                self.running = False
+                import sys
+                sys.exit(0)
             return response
         except Exception as error:
             print(f"Error sending command: {error}")
-            return {'status': 'error', 'message': str(error)}
+            print("\n[Error] Lost connection to server. Exiting...")
+            self.running = False
+            import sys
+            sys.exit(0)
     
     def main_menu(self):                                # display main menu options
         print("\n" + "="*50)

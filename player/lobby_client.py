@@ -126,10 +126,16 @@ class EnhancedLobbyClient:
                 request.update(data)
             send_message(self.socket, request)
             response = recv_message(self.socket)
+            if response is None:
+                print("\n[Error] Server disconnected. Exiting...")
+                self.running = False
+                sys.exit(0)
             return response
         except Exception as error:
             print(f"Error sending command: {error}")
-            return {'status': 'error', 'message': str(error)}
+            print("\n[Error] Lost connection to server. Exiting...")
+            self.running = False
+            sys.exit(0)
     
     def main_menu(self):                                            # main menu display
         print("=== MAIN MENU ===")
