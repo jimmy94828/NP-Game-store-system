@@ -284,15 +284,22 @@ class GameServer:
         
         print(f"[Game] Server started on port {self.port} for room {self.room_id}")
         
-        while self.running:
-            try:
-                client_socket, address = server_socket.accept()
-                thread = threading.Thread(target=self.handle_connection, args=(client_socket,))
-                thread.daemon = True
-                thread.start()
-            except Exception as error:
-                if self.running:
-                    print(f"[Game] Error accepting connection: {error}")
+        try:
+            while self.running:
+                try:
+                    client_socket, address = server_socket.accept()
+                    thread = threading.Thread(target=self.handle_connection, args=(client_socket,))
+                    thread.daemon = True
+                    thread.start()
+                except Exception as error:
+                    if self.running:
+                        print(f"[Game] Error accepting connection: {error}")
+        except KeyboardInterrupt:
+            print("\n[Game] Server shutting down...")
+        finally:
+            self.running = False
+            server_socket.close()
+            print("[Game] Server stopped")
 
     def handle_connection(self, client_socket):         # players in a room will connect to the game server
         try:
@@ -666,6 +673,8 @@ if __name__ == '__main__':
             print(f"[GameServer] Starting Tetris on port {port}, room {room}, game: {game_name} v{game_version}, players: {players}")
             gs = GameServer(port, room, players, game_id, game_name, game_version)
             gs.start()
+        except KeyboardInterrupt:
+            print("\n[GameServer] Interrupted by user")
         except Exception as e:
             print(f"Failed to start GameServer: {e}")
     elif len(sys.argv) >= 3:  # Old format without game info (fallback)
@@ -676,6 +685,8 @@ if __name__ == '__main__':
             print(f"[GameServer] Starting Tetris on port {port}, room {room}, players: {players}")
             gs = GameServer(port, room, players)
             gs.start()
+        except KeyboardInterrupt:
+            print("\n[GameServer] Interrupted by user")
         except Exception as e:
             print(f"Failed to start GameServer: {e}")
     else:

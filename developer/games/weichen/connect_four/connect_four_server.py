@@ -189,20 +189,26 @@ class GameServer:
 
         try:
             while len(self.sockets) < 2 and self.running:           # player connections
-                client_sock, addr = self.server_socket.accept()
-                print(f"[GameServer] Player connected from {addr}")
                 try:
-                    raw = client_sock.recv(4096)
-                    if not raw:
-                        client_sock.close()
-                        continue
-                    info = json.loads(raw.decode())
-                    username = info.get('username', f'Player{len(self.sockets)+1}')
-                except Exception:
-                    username = f'Player{len(self.sockets)+1}'
+                    client_sock, addr = self.server_socket.accept()
+                    print(f"[GameServer] Player connected from {addr}")
+                    try:
+                        raw = client_sock.recv(4096)
+                        if not raw:
+                            client_sock.close()
+                            continue
+                        info = json.loads(raw.decode())
+                        username = info.get('username', f'Player{len(self.sockets)+1}')
+                    except Exception:
+                        username = f'Player{len(self.sockets)+1}'
 
-                self.sockets.append(client_sock)
-                self.usernames.append(username)
+                    self.sockets.append(client_sock)
+                    self.usernames.append(username)
+                except KeyboardInterrupt:
+                    raise
+                except Exception as e:
+                    if self.running:
+                        print(f"[GameServer] Error accepting connection: {e}")
 
             if len(self.sockets) < 2:
                 print("[GameServer] Not enough players, aborting.")
@@ -387,8 +393,11 @@ def main():
         players = ['A', 'B']  # Default for testing only
     
     print(f"[GameServer] Starting on port {port}, room {room}, game: {game_name} v{game_version}, players: {players}")
-    gs = GameServer(port, room, players, game_id, game_name, game_version)
-    gs.start()
+    try:
+        gs = GameServer(port, room, players, game_id, game_name, game_version)
+        gs.start()
+    except KeyboardInterrupt:
+        print("\n[GameServer] Interrupted by user")
 
 
 if __name__ == '__main__':

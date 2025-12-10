@@ -123,12 +123,18 @@ class GameServer:
 
         try:
             while len(self.sockets) < self.num_players and self.running:  # accept dynamic number of players
-                client_sock, addr = self.server_socket.accept()
-                print(f"[GameServer] Player {len(self.sockets)+1}/{self.num_players} connected from {addr}")
-                username = self.players[len(self.sockets)]
-                
-                self.sockets.append(client_sock)
-                self.usernames.append(username)
+                try:
+                    client_sock, addr = self.server_socket.accept()
+                    print(f"[GameServer] Player {len(self.sockets)+1}/{self.num_players} connected from {addr}")
+                    username = self.players[len(self.sockets)]
+                    
+                    self.sockets.append(client_sock)
+                    self.usernames.append(username)
+                except KeyboardInterrupt:
+                    raise
+                except Exception as e:
+                    if self.running:
+                        print(f"[GameServer] Error accepting connection: {e}")
 
             if len(self.sockets) < self.num_players:
                 print(f"[GameServer] Not enough players (got {len(self.sockets)}, need {self.num_players}).")
@@ -368,8 +374,11 @@ def main():
         sys.exit(1)
     
     print(f"[GameServer] Starting Bingo on port {port}, room {room_id}, game: {game_name} v{game_version}, players: {players}")
-    server = GameServer(port, room_id, players, game_id, game_name, game_version)
-    server.start()
+    try:
+        server = GameServer(port, room_id, players, game_id, game_name, game_version)
+        server.start()
+    except KeyboardInterrupt:
+        print("\n[GameServer] Interrupted by user")
 
 if __name__ == '__main__':
     main()
