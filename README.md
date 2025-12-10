@@ -16,18 +16,21 @@
 ### **Server** 
 - **Database Server**: 
    - Database server主要負責所有關於資料庫的create, read, update, delete和query的處理，當database server收到來自lobby server或developer server對於資料庫的操作請求時，database server會檢查request的內容來判斷各個request是要對哪個欄位進行什麼操作，再根據request進行資料庫操作並回傳結果。database 會以.json的形式儲存，其中包含User、Gamelog、developer、game欄位，分別儲存玩家資訊、遊戲紀錄、開發者資訊和遊戲詳情。
+  
 - **Lobby Server**:
    - Lobby server主要負責處理玩家的所有操作與需求，會接收來自lobby_client的request判斷需要針對database做什麼操作或是是否要啟動遊戲，再根據玩家的request傳送相對應的database request到database server，當玩家的每個request被lobby server處理完後，lobby server會回傳成功或是錯誤訊息給送出request的玩家。
+  
 - **Developer Server**:
    - Developer server主要負責處理開發者的所有操作，包含創建遊戲、修改或上架遊戲、瀏覽詳細的遊戲資訊。Developer server匯處理developer相關的所有操作，並接收來自於developer發出的request，當developer server接收到來自developer發出的request時，會判斷每個request是關於什麼操作，如果request牽涉到database的create, read, update, delete, query，則developer會發送相對應的database request到database server進行資料庫操作。當developer server處理完每個request後，會根據職結果回傳相對應的訊息給發出request的developer。
+  
 ### **Client**
 - **Player Client**: 
   在player登入後，會進入main menu:
   ```
-  1. Game Store         -> 進入game store
-  2. Lobby              -> 進入lobby
-  3. Logout             -> 登出
-  4. Exit               -> 結束程式
+  1. Game Store               -> 進入game store
+  2. Lobby                    -> 進入lobby
+  3. Logout                   -> 登出
+  4. Exit                     -> 結束程式
   ```
   當player第一個選項進入Game Store時會看到game store menu:
   ```
@@ -50,18 +53,16 @@
   ```
    在player選擇3. Create Room & Play並成功進入房間後，該player會成為房間的host，並會看到host menu:
    ```
-   1. Start Game               -> 開始遊戲
-   2. Invite Player            -> 邀請其他完機加入房間
-   3. Leave Room               -> 離開房間
+   1. Start Game              -> 開始遊戲
+   2. Invite Player           -> 邀請其他玩家加入房間
+   3. Leave Room              -> 離開房間
    ```
    在player選擇4. Join Room & Play 或6. Accept Invitation並成功進入房間後，如果player不是該房間的創建者，則player會以非host的身分進入房間，會看到room menu並開始等待房間的host開始遊戲:
    ```
-   1. Leave Room               -> 離開房間
+   1. Leave Room              -> 離開房間
    ```
   player 可以自由的在game store和lobby間進行切換來達到瀏覽遊戲->下載遊戲->選擇遊戲創建房間->邀請玩家->開始遊戲的流程，在遊戲結束時player會回到room。
 - **Developer Client**: 
-  當developer成功登入後，會在`/developer/games/<developer_name>/`看到自己所開發的遊戲資料夾，一開始是空的，而在`developer/games/weichen`中也會有三個已經支援的遊戲範例，分別是Extend Connect Four、Multiplayer Bingo和Tetris Battle，developer可以參考這三個遊戲的格式來開發自己的遊戲。developer也可以直接手動複製這三個遊戲的資料夾到自己的developer資料夾中來進行修改和上傳。
-  在developer選擇上傳遊戲時，developer需要選擇遊戲的資料夾並上傳該遊戲，系統會根據遊戲中的config.json來驗證遊戲的格式是否正確，如果格式正確則會將遊戲上傳到game server中，否則會回傳錯誤訊息給developer。在developer選擇更新遊戲時，developer需要選擇已經上傳到game server中的遊戲並選擇要更新的版本，系統會根據遊戲中的config.json來驗證遊戲的格式是否正確，如果格式正確則會將遊戲更新到game server中，否則會回傳錯誤訊息給developer。在developer選擇移除遊戲時，developer需要選擇已經上傳到game server中的遊戲並確認移除該遊戲，系統會將該遊戲從game server中移除但仍然保留在database中以供developer查看。在developer選擇列出自己的遊戲時，系統會列出該developer所開發的所有遊戲包含已經移除的版本。在developer選擇由template新增遊戲框架時，系統會在`developer/games/<developer_name>/`中建立一個新的遊戲資料夾並複製template中的檔案到該資料夾中以供developer進行開發。
   在developer登入之後，developer會看到developer main menu:
   ```
   1. Check My Game / Upload New Game  -> 查看並上傳新的遊戲
@@ -70,8 +71,11 @@
   4. List My Uploaded Games           -> 列出自己上傳過的遊戲(包含已移除版本)
   5. Create Game from Template        -> 由template新增遊戲框架
   6. Logout                           -> 登出
-  0. Exit                             -> 結束程式
+  7. Exit                             -> 結束程式
   ```
+  當developer成功登入後，會在`/developer/games/<developer_name>/`看到自己所開發的遊戲資料夾，初始時會將在`developer/games/weichen`中的三個已經支援的遊戲範例複製一份進入該開法者的資料夾，遊戲分別是Extend Connect Four、Multiplayer Bingo和Tetris Battle，developer可以參考這三個遊戲的格式來開發自己的遊戲。developer也可以直接手動複製這三個遊戲的資料夾到自己的developer資料夾中來進行修改和上傳。
+  
+  在developer選擇上傳遊戲時，developer需要選擇遊戲的資料夾並上傳該遊戲，系統會根據遊戲中的config.json來驗證遊戲的格式是否正確，如果格式正確則會將遊戲上傳到server端的`uploaded_games/`資料夾中，並在database中新增該遊戲的資訊。
 
 ### **Supported Games**
 #### Extened Connect Four
@@ -185,35 +189,6 @@ DEVELOPER_SERVER_PORT = 17049
 ```
 ---
 
-### Example Flows
-#### Player Play Game flow
-```
-1.  Register account and login
-2.  Go to Game store
-3.  Browse store -> Select "Extend Connect Four"
-4.  Download game
-5.  Go to Lobby
-6.  Create room -> Select "Extend Connect Four"
-7.  Wait for player 2 to join
-8.  Start game
-9.  Play Connect Four
-10. Return to room after game finishes
-```
-
-#### Developer Upload Game flow
-```
-1. Login as developer
-2. Create game folder in developer/games/<dev_name>/<game_name>/
-3. Add required files:
-   - config.json (game metadata)
-   - <server_file>.py (game server)
-   - <main_file>.py (game client)
-4. Select "Upload Game" -> Select the game folder to upload
-5. Configure metadata (name, version, description, etc.)
-6. System validates files and config
-7. Upload completed -> Players can download
-```
-
 ## System Architecture
 
 ### Component Diagram
@@ -251,7 +226,7 @@ DEVELOPER_SERVER_PORT = 17049
 ## System Structure
 
 ```
-test/
+NP-Game-store-system/
 ├── README.md                    # README file (This file)
 ├── start_server.py              # Server startup script
 ├── start_player.py              # Player client launcher
