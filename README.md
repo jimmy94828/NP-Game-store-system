@@ -2,10 +2,35 @@
 #### 112550047 徐瑋晨
 在這次的作業中，我基於HW1和HW2所設計的遊戲和client/server架構建構出一個遊戲商城系統，此遊戲商城系統可以讓開發者開發遊戲並上傳到遊戲商城，開發者也可以在需要時更新或移除自己所上架的遊戲。而玩家則是可以在遊戲商城中瀏覽各個已經上架的遊戲，也可以下載自己想玩的遊戲並創立房間邀請其他玩家一起共同遊玩遊戲。
 
+#### Quick start for demo
+**Environment**: 
+- Python 3.10+ (standard library only for server/CLI games)
+- pygame (required for GUI games like Tetris)
+```bash
+# 1. Clone repository
+git clone https://github.com/jimmy94828/NP-Game-store-system
+cd NP-Game-store-system
+# 2. install pygame for GUI game
+pip install pygame
+
+# 3. start servers run on server 140.113.17.11
+chmod +x start_server.py
+./start_server.py
+
+# 4. Start Player Client (in another terminal)
+chmod +x start_player.py
+./start_player.py
+
+# 5. Start Developer Client (in another terminal)
+chmod +x start_developer.py
+./start_developer.py
+```
+
+
 ## Table of Contents
 - [System Overview](#system-overview)
 - [Supported Games](#supported-games)
-- [Start System](#start-system)
+- [Start System](#start-system) - Run servers and clients
 - [System Architecture](#system-architecture)
 - [System Structure](#system-structure)
 
