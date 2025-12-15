@@ -195,6 +195,10 @@ class DeveloperServer:
                     response = self.login_developer(request)
                     if response['status'] == 'success':
                         dev_id = response.get('devId')
+                elif command == 'dev_logout':
+                    response = self.logout_developer(request)
+                    if response['status'] == 'success':
+                        dev_id = None
                 elif command == 'upload_game':
                     response = self.upload_game(client_socket, request)
                 elif command == 'update_game':
@@ -277,6 +281,26 @@ class DeveloperServer:
             return {'status': 'error', 'message': 'Failed to update online status'}
         
         return {'status': 'success', 'message': 'Login successful', 'devId': dev['id']}
+    
+    def logout_developer(self, request):            # developer logout
+        dev_id = request.get('devId')
+        if not dev_id:
+            return {'status': 'error', 'message': 'Developer ID required'}
+        
+        # set developer offline status to 0
+        update_response = self.database_request({
+            'collection': 'Developer',
+            'action': 'update',
+            'data': {
+                'id': dev_id,
+                'fields': {'online': 0}
+            }
+        })
+        
+        if update_response['status'] != 'success':
+            return {'status': 'error', 'message': 'Failed to update online status'}
+        
+        return {'status': 'success', 'message': 'Logout successful'}
     
     def upload_game(self, client_socket, request):  # handle game upload from developer
         try:

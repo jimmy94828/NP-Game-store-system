@@ -208,6 +208,22 @@ class DeveloperClient:
             print(f"Login failed: {response.get('message', 'Unknown error')}")
             return False
     
+    def logout(self):                                   # developer logout
+        if not self.dev_id:
+            print("You are not logged in")
+            return False
+        
+        response = self.send_command('dev_logout', {'devId': self.dev_id})
+        
+        if response and response['status'] == 'success':
+            print("Logout successful!")
+            self.dev_id = None
+            self.username = None
+            return True
+        else:
+            print(f"Logout failed: {response.get('message', 'Unknown error')}")
+            return False
+    
     def list_local_games(self):                         # list local games in development directory
         try:
             games = [d for d in os.listdir(self.games_dir) if os.path.isdir(os.path.join(self.games_dir, d))]
@@ -795,10 +811,8 @@ class DeveloperClient:
                     elif choice == '5':
                         self.create_from_template()
                     elif choice == '6':
-                        print("\nLogging out...")
-                        logged_in = False
-                        self.dev_id = None
-                        self.username = None
+                        if self.logout():
+                            logged_in = False
                     elif choice == '0':
                         print("\nExit!")
                         self.running = False
